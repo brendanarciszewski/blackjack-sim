@@ -8,9 +8,13 @@ fn main() -> Result<(), Box<dyn Error>> {
 	const TRIALS: i32 = 1000;
 	let mut wtr = Writer::from_path("out.csv")?;
 	wtr.write_record(&["Player's 1st Card",
+					   "Player's 1st Card Value",
 					   "Dealer's 1st Card",
+					   "Dealer's 1st Card Value",
 					   "Player's 2nd Card",
+					   "Player's 2nd Card Value",
 					   "Dealer's 2nd Card",
+					   "Dealer's 2nd Card Value",
 					   "Player's Sum",
 					   "Dealer's Sum"])?;
 	for _ in 0..TRIALS {
@@ -23,9 +27,13 @@ fn main() -> Result<(), Box<dyn Error>> {
 		}
 		let player_sum: i32 = player.iter().map(|a| a.val()).sum();
 		let dealer_sum: i32 = dealer.iter().map(|a| a.val()).sum();
-		let rec = vec![format!("{}", player[0].val()),
+		let rec = vec![format!("{:?}", player[0]),
+					   format!("{}", player[0].val()),
+					   format!("{:?}", dealer[0]),
 					   format!("{}", dealer[0].val()),
+					   format!("{:?}", player[1]),
 					   format!("{}", player[1].val()), 
+					   format!("{:?}", dealer[1]),
 					   format!("{}", dealer[1].val()),
 					   format!("{}", player_sum),
 					   format!("{}", dealer_sum)];
