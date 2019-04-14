@@ -40,23 +40,22 @@ fn main() -> Result<(), Box<dyn Error>> {
           dealer_sums.push(dealer.sum(i, ACE_VAL));
         }
 
-        let rec = vec![format!("{:?}", player[0]),
-                       format!("{}", player[0].val(ACE_VAL)),
-                       format!("{:?}", dealer[0]),
-                       format!("{}", dealer[0].val(ACE_VAL)),
-                       format!("{:?}", player[1]),
-                       format!("{}", player[1].val(ACE_VAL)), 
-                       format!("{:?}", dealer[1]),
-                       format!("{}", dealer[1].val(ACE_VAL)),
-                       format!("{}", player_sums[1]),
-                       format!("{}", dealer_sums[1]),
-                       format!("{:?}", player[2]),
-                       format!("{}", player[2].val(ACE_VAL)), 
-                       format!("{:?}", dealer[2]),
-                       format!("{}", dealer[2].val(ACE_VAL)),
-                       format!("{}", player_sums[2]),
-                       format!("{}", dealer_sums[2])];
-        wtr.write_record(&rec)?;
+        wtr.write_record(&[format!("{:?}", player[0]),
+                           format!("{}", player[0].val(ACE_VAL)),
+                           format!("{:?}", dealer[0]),
+                           format!("{}", dealer[0].val(ACE_VAL)),
+                           format!("{:?}", player[1]),
+                           format!("{}", player[1].val(ACE_VAL)), 
+                           format!("{:?}", dealer[1]),
+                           format!("{}", dealer[1].val(ACE_VAL)),
+                           format!("{}", player_sums[1]),
+                           format!("{}", dealer_sums[1]),
+                           format!("{:?}", player[2]),
+                           format!("{}", player[2].val(ACE_VAL)), 
+                           format!("{:?}", dealer[2]),
+                           format!("{}", dealer[2].val(ACE_VAL)),
+                           format!("{}", player_sums[2]),
+                           format!("{}", dealer_sums[2])])?;
     }
     Ok(())
 }
