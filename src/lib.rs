@@ -48,9 +48,9 @@ pub fn output_to_csv(trials: i32, ace_val: i32) -> Result<(), Box<dyn Error>> {
                            format!("{}", player_sums[1]),
                            format!("{}", dealer_sums[1]),
                            format!("{:?}", player[2]),
-                           format!("{}", player[2].val(ace_val)), 
+                           format!("{}", player[2].val(1)), 
                            format!("{:?}", dealer[2]),
-                           format!("{}", dealer[2].val(ace_val)),
+                           format!("{}", dealer[2].val(1)),
                            format!("{}", player_sums[2]),
                            format!("{}", dealer_sums[2])])?;
     }
