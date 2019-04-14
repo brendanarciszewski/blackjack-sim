@@ -1,0 +1,9 @@
+[package]
+name = "blackjack-sim"
+version = "0.1.0"
+authors = ["Brendan Arciszewski <git@brendanarciszewski.ca>"]
+edition = "2018"
+
+[dependencies]
+rand = "0.6"
+csv = "1"
