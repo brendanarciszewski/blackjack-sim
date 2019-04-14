@@ -1,3 +1,6 @@
+use rand::prelude::*;
+use std::ops::Index;
+
 #[derive(Debug, PartialEq)]
 enum Suit {
     Heart,
@@ -24,8 +27,9 @@ enum Value {
 }
 
 impl Value {
-    fn val(&self) -> i32 {
+    fn val(&self, ace_val: i32) -> i32 {
         match self {
+            Value::Ace => ace_val,
             Value::Jack | Value::Queen | Value::King => 10 as i32,
             x => x.clone() as i32 
         }
@@ -39,17 +43,21 @@ pub struct Card {
 }
 
 impl Card {
-    pub fn val(&self) -> i32 {
-        self.value.val()
+    pub fn val(&self, ace_val: i32) -> i32 {
+        self.value.val(ace_val)
     }
 }
 
+pub trait Deck {
+    fn pick(&mut self) -> Option<Card>;
+}
+
 #[derive(Debug)]
-pub struct Deck {
+pub struct DealerDeck {
     cards: Vec<Card>
 }
 
-impl Deck {
+impl DealerDeck {
     pub fn new() -> Self {
         let mut cards = vec![];
         for num_s in 1..5 {
@@ -82,15 +90,57 @@ impl Deck {
             }
         }
         
-        use rand::prelude::*;
         let mut rng = thread_rng();
         cards.shuffle(&mut rng);
 
         assert_eq!(cards.len(), 52);
-        Deck {cards}
+        Self {cards}
+    }
+}
+
+impl Deck for DealerDeck {
+    fn pick(&mut self) -> Option<Card> {
+        self.cards.pop()
+    }
+}
+
+
+#[derive(Debug)]
+pub struct PlayerHand {
+    cards: Vec<Card>
+}
+
+impl PlayerHand {
+    pub fn new() -> Self {
+        Self {cards: vec![]}
     }
 
-    pub fn pick(&mut self) -> Option<Card> {
+    pub fn from_card(card: Card) -> Self {
+        Self {cards: vec![card]}
+    }
+
+    pub fn push(&mut self, card: Card) {
+        self.cards.push(card)
+    }
+
+    pub fn sum(&self, card_count: usize, ace_val: i32) -> i32 {
+        self.cards[..card_count].iter().map(|a| a.val(ace_val)).sum()
+    }
+}
+
+impl Deck for PlayerHand {
+    fn pick(&mut self) -> Option<Card> {
+        let mut rng = thread_rng();
+        self.cards.shuffle(&mut rng);
+
         self.cards.pop()
+    }
+}
+
+impl Index<usize> for PlayerHand {
+    type Output = Card;
+
+    fn index(&self, i: usize) -> &Card {
+        &self.cards[i]
     }
 }

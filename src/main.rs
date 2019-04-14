@@ -2,10 +2,11 @@ use std::error::Error;
 use csv::Writer;
 
 mod deck;
-use deck::Deck;
+use deck::{Deck, DealerDeck, PlayerHand};
 
 fn main() -> Result<(), Box<dyn Error>> {
     const TRIALS: i32 = 1000;
+    const ACE_VAL: i32 = 11;
     let mut wtr = Writer::from_path("out.csv")?;
     wtr.write_record(&["Player's 1st Card",
                        "Player's 1st Card Value",
@@ -15,30 +16,47 @@ fn main() -> Result<(), Box<dyn Error>> {
                        "Player's 2nd Card Value",
                        "Dealer's 2nd Card",
                        "Dealer's 2nd Card Value",
-                       "Player's Sum",
-                       "Dealer's Sum"])?;
+                       "Player's 2 Card Sum",
+                       "Dealer's 2 Card Sum",
+                       "Player's 3rd Card",
+                       "Player's 3rd Card Value",
+                       "Dealer's 3rd Card",
+                       "Dealer's 3rd Card Value",
+                       "Player's 3 Card Sum",
+                       "Dealer's 3 Card Sum"])?;
     for _ in 0..TRIALS {
-        let mut deck = Deck::new();
-        let mut player = vec![];
-        let mut dealer = vec![];
-        for _ in 0..2 {
+        let mut deck = DealerDeck::new();
+        let mut player = PlayerHand::new();
+        let mut dealer = PlayerHand::new();
+        for _ in 0..3 {
             player.push(deck.pick().unwrap());
             dealer.push(deck.pick().unwrap());
         }
-        let player_sum: i32 = player.iter().map(|a| a.val()).sum();
-        let dealer_sum: i32 = dealer.iter().map(|a| a.val()).sum();
+
+        let mut player_sums = vec![];
+        let mut dealer_sums = vec![];
+        for i in 1..4 {
+          player_sums.push(player.sum(i, ACE_VAL));
+          dealer_sums.push(dealer.sum(i, ACE_VAL));
+        }
+
         let rec = vec![format!("{:?}", player[0]),
-                       format!("{}", player[0].val()),
+                       format!("{}", player[0].val(ACE_VAL)),
                        format!("{:?}", dealer[0]),
-                       format!("{}", dealer[0].val()),
+                       format!("{}", dealer[0].val(ACE_VAL)),
                        format!("{:?}", player[1]),
-                       format!("{}", player[1].val()), 
+                       format!("{}", player[1].val(ACE_VAL)), 
                        format!("{:?}", dealer[1]),
-                       format!("{}", dealer[1].val()),
-                       format!("{}", player_sum),
-                       format!("{}", dealer_sum)];
+                       format!("{}", dealer[1].val(ACE_VAL)),
+                       format!("{}", player_sums[1]),
+                       format!("{}", dealer_sums[1]),
+                       format!("{:?}", player[2]),
+                       format!("{}", player[2].val(ACE_VAL)), 
+                       format!("{:?}", dealer[2]),
+                       format!("{}", dealer[2].val(ACE_VAL)),
+                       format!("{}", player_sums[2]),
+                       format!("{}", dealer_sums[2])];
         wtr.write_record(&rec)?;
-        //println!("{:?}\n{:?}\n", player, dealer);
     }
     Ok(())
 }
