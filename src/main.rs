@@ -7,7 +7,7 @@ use deck::{Deck, DealerDeck, PlayerHand};
 fn main() -> Result<(), Box<dyn Error>> {
     const TRIALS: i32 = 1000;
     const ACE_VAL: i32 = 11;
-    let mut wtr = Writer::from_path("out.csv")?;
+    let mut wtr = Writer::from_path("./target/output.csv")?;
     wtr.write_record(&["Player's 1st Card",
                        "Player's 1st Card Value",
                        "Dealer's 1st Card",
@@ -24,20 +24,18 @@ fn main() -> Result<(), Box<dyn Error>> {
                        "Dealer's 3rd Card Value",
                        "Player's 3 Card Sum",
                        "Dealer's 3 Card Sum"])?;
+
     for _ in 0..TRIALS {
         let mut deck = DealerDeck::new();
         let mut player = PlayerHand::new();
+        let mut player_sums = vec![];
         let mut dealer = PlayerHand::new();
-        for _ in 0..3 {
+        let mut dealer_sums = vec![];
+        for i in 0..3 {
             player.push(deck.pick().unwrap());
             dealer.push(deck.pick().unwrap());
-        }
-
-        let mut player_sums = vec![];
-        let mut dealer_sums = vec![];
-        for i in 1..4 {
-          player_sums.push(player.sum(i, ACE_VAL));
-          dealer_sums.push(dealer.sum(i, ACE_VAL));
+            player_sums.push(player.sum(i, ACE_VAL));
+            dealer_sums.push(dealer.sum(i, ACE_VAL));
         }
 
         wtr.write_record(&[format!("{:?}", player[0]),
