@@ -1,4 +1,4 @@
-use rand::prelude::*;
+use rand::{self, seq::SliceRandom};
 use std::ops::Index;
 use crate::card::{*, attr::IntegerToEnum};
 
@@ -22,7 +22,7 @@ impl ShuffledDeck {
             }
         }
         
-        let mut rng = thread_rng();
+        let mut rng = rand::thread_rng();
         cards.shuffle(&mut rng);
 
         Self {cards}
@@ -61,7 +61,7 @@ impl PlayerHand {
 
 impl Deck for PlayerHand {
     fn pick(&mut self) -> Option<Card> {
-        let mut rng = thread_rng();
+        let mut rng = rand::thread_rng();
         self.cards.shuffle(&mut rng);
 
         self.cards.pop()
@@ -81,8 +81,14 @@ mod tests {
     use super::*;
 
     #[test]
-    fn dealer_deck_size() {
+    fn dealer_deck_52_cards() {
         let d = ShuffledDeck::new();
         assert_eq!(d.cards.len(), 52);
+    }
+
+    #[test]
+    fn player_hand_empty() {
+        let p = PlayerHand::new();
+        assert_eq!(p.cards.len(), 0);
     }
 }
