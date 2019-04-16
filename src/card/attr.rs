@@ -42,11 +42,11 @@ pub enum Value {
 }
 
 impl Value {
-    pub fn val(&self, ace_val: i32) -> i32 {
+    pub fn as_num(&self, ace_val: u32) -> u32 {
         match self {
             Value::Ace => ace_val,
-            Value::Jack | Value::Queen | Value::King => 10 as i32,
-            x => x.clone() as i32 
+            Value::Jack | Value::Queen | Value::King => 10_u32,
+            x => x.clone() as u32 
         }
     }
 }
@@ -68,6 +68,44 @@ impl IntegerToEnum for Value {
             12 => Some(Value::Queen),
             13 => Some(Value::King),
             _ => None
+        }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    
+    #[test]
+    fn num_2_10_get_value() {
+        for i in 2..11 {
+            let v = Value::get_item(i).unwrap();
+            assert_eq!(v.as_num(1), i as u32);
+            assert_eq!(v.as_num(11), i as u32);
+        }
+    }
+
+    #[test]
+    fn ace_get_value() {
+        let v = Value::get_item(1).unwrap();
+        assert_eq!(v.as_num(1), 1);
+        assert_eq!(v.as_num(11), 11);
+    }
+
+    #[test]
+    fn royalty_get_value() {
+        for i in 11..14 {
+            let v = Value::get_item(i).unwrap();
+            assert_eq!(v.as_num(1), 10);
+            assert_eq!(v.as_num(11), 10);
+        }
+    }
+
+    #[test]
+    fn get_suit() {
+        for i in 0..4 {
+            let s = Suit::get_item(i).unwrap();
+            assert_eq!(s as i32, i);
         }
     }
 }

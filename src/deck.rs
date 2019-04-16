@@ -1,6 +1,7 @@
-use rand::{self, seq::SliceRandom};
-use std::ops::Index;
+ use rand::{self, seq::SliceRandom};
+use std::{ops::{Deref, FnMut}, default::Default, iter::{Iterator, Map}};
 use crate::card::{*, attr::IntegerToEnum};
+use super::sim::Simulation;
 
 pub trait Deck {
     fn pick(&mut self) -> Option<Card>;
@@ -27,11 +28,23 @@ impl ShuffledDeck {
 
         Self {cards}
     }
+
+    pub fn simulate<F, T>(trials: u32, f: F) -> Map<Simulation<Self>, F>
+        where F: FnMut(Self) -> T,
+    {
+        Simulation::<Self>::new(trials).map(f)
+    }   
 }
 
 impl Deck for ShuffledDeck {
     fn pick(&mut self) -> Option<Card> {
         self.cards.pop()
+    }
+}
+
+impl Default for ShuffledDeck {
+    fn default() -> Self {
+        ShuffledDeck::new()
     }
 }
 
@@ -54,8 +67,8 @@ impl PlayerHand {
         self.cards.push(card)
     }
 
-    pub fn sum(&self, last_index: usize, ace_val: i32) -> i32 {
-        self.cards[..last_index+1].iter().map(|a| a.val(ace_val)).sum()
+    pub fn sum(&self, last_index: usize, ace_val: u32) -> u32 {
+        self.cards[..last_index+1].iter().map(|a| a.value().as_num(ace_val)).sum()
     }
 }
 
@@ -68,11 +81,11 @@ impl Deck for PlayerHand {
     }
 }
 
-impl Index<usize> for PlayerHand {
-    type Output = Card;
+impl Deref for PlayerHand {
+    type Target = Vec<Card>;
 
-    fn index(&self, i: usize) -> &Card {
-        &self.cards[i]
+    fn deref(&self) -> &Vec<Card> {
+        &self.cards
     }
 }
 
