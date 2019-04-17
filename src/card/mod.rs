@@ -1,3 +1,4 @@
+//! Useful model of a Card
 pub mod attr;
 use attr::*;
 

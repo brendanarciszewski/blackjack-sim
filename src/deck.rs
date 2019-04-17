@@ -1,18 +1,22 @@
- use rand::{self, seq::SliceRandom};
+//! Contains useful groups of Cards
+use rand::{self, seq::SliceRandom};
 use std::{ops::{Deref, FnMut}, default::Default, iter::{Iterator, Map}};
 use crate::card::{*, attr::IntegerToEnum};
 use super::sim::Simulation;
 
+///A group of Cards
 pub trait Deck {
     fn pick(&mut self) -> Option<Card>;
 }
 
+///A deck for the dealer to use
 #[derive(Debug)]
 pub struct ShuffledDeck {
     cards: Vec<Card>
 }
 
 impl ShuffledDeck {
+    ///A shuffled, 52 card, deck
     pub fn new() -> Self {
         let mut cards = vec![];
         for num_s in 0..4 {
@@ -29,6 +33,7 @@ impl ShuffledDeck {
         Self {cards}
     }
 
+    ///An Iterator that will run `f` on each Card when consumed
     pub fn simulate<F, T>(trials: u32, f: F) -> Map<Simulation<Self>, F>
         where F: FnMut(Self) -> T,
     {
@@ -37,6 +42,7 @@ impl ShuffledDeck {
 }
 
 impl Deck for ShuffledDeck {
+    ///The Card at the top of the deck, if it's not empty
     fn pick(&mut self) -> Option<Card> {
         self.cards.pop()
     }
@@ -48,31 +54,42 @@ impl Default for ShuffledDeck {
     }
 }
 
-
+///Useful to take cards from a deck
 #[derive(Debug)]
 pub struct PlayerHand {
     cards: Vec<Card>
 }
 
 impl PlayerHand {
+    ///An empty PlayerHand
     pub fn new() -> Self {
         Self {cards: vec![]}
     }
 
+    ///A PlayerHand with one card
     pub fn from_card(card: Card) -> Self {
         Self {cards: vec![card]}
     }
 
+    ///Add a card to the hand
     pub fn push(&mut self, card: Card) {
         self.cards.push(card)
     }
 
+    ///Sum the BlackJack value of the hand
+    ///```
+    ///use blackjack_sim::{deck::PlayerHand, card::{Card, attr}};
+    ///let mut player = PlayerHand::new();
+    ///player.push(Card::new(attr::Value::Ace, attr::Suit::Heart));
+    ///assert_eq!(player.sum(player.len()-1, 1), 1);
+    ///```
     pub fn sum(&self, last_index: usize, ace_val: u32) -> u32 {
         self.cards[..last_index+1].iter().map(|a| a.value().as_num(ace_val)).sum()
     }
 }
 
 impl Deck for PlayerHand {
+    ///A random card from the hand
     fn pick(&mut self) -> Option<Card> {
         let mut rng = rand::thread_rng();
         self.cards.shuffle(&mut rng);

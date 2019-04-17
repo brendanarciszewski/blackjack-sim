@@ -1,9 +1,14 @@
+//! Attributes of a Card
 use std::marker::Sized;
 
+///Standardize how I'm going to iterate over the values.
+///Wanted to see how a Trait would work.
+///Would use an Iterator next time.
 pub trait IntegerToEnum {
     fn get_item(val: i32) -> Option<Self> where Self: Sized;
 }
 
+///The suit of the card
 #[derive(Debug, PartialEq)]
 pub enum Suit {
     Heart,
@@ -24,6 +29,7 @@ impl IntegerToEnum for Suit {
     }
 }
 
+///The value of the card
 #[derive(Debug, PartialEq, Clone)]
 pub enum Value {
     Ace = 1,
@@ -42,6 +48,7 @@ pub enum Value {
 }
 
 impl Value {
+    ///Get the Blackjack value of the card
     pub fn as_num(&self, ace_val: u32) -> u32 {
         match self {
             Value::Ace => ace_val,
