@@ -1,8 +1,12 @@
 //! Contains useful groups of Cards
-use rand::{self, seq::SliceRandom};
-use std::{ops::{Deref, FnMut}, default::Default, iter::{Iterator, Map}};
-use crate::card::{*, attr::IntegerToEnum};
 use super::sim::Simulation;
+use crate::card::{attr::IntegerToEnum, *};
+use rand::{self, seq::SliceRandom};
+use std::{
+    default::Default,
+    iter::{Iterator, Map},
+    ops::{Deref, FnMut},
+};
 
 ///A group of Cards
 pub trait Deck {
@@ -12,7 +16,7 @@ pub trait Deck {
 ///A deck for the dealer to use
 #[derive(Debug)]
 pub struct ShuffledDeck {
-    cards: Vec<Card>
+    cards: Vec<Card>,
 }
 
 impl ShuffledDeck {
@@ -26,19 +30,20 @@ impl ShuffledDeck {
                 cards.push(Card::new(value, suit));
             }
         }
-        
+
         let mut rng = rand::thread_rng();
         cards.shuffle(&mut rng);
 
-        Self {cards}
+        Self { cards }
     }
 
     ///An Iterator that will run `f` on each Card when consumed
     pub fn simulate<F, T>(trials: u32, f: F) -> Map<Simulation<Self>, F>
-        where F: FnMut(Self) -> T,
+    where
+        F: FnMut(Self) -> T,
     {
         Simulation::<Self>::new(trials).map(f)
-    }   
+    }
 }
 
 impl Deck for ShuffledDeck {
@@ -57,18 +62,18 @@ impl Default for ShuffledDeck {
 ///Useful to take cards from a deck
 #[derive(Debug)]
 pub struct PlayerHand {
-    cards: Vec<Card>
+    cards: Vec<Card>,
 }
 
 impl PlayerHand {
     ///An empty PlayerHand
     pub fn new() -> Self {
-        Self {cards: vec![]}
+        Self { cards: vec![] }
     }
 
     ///A PlayerHand with one card
     pub fn from_card(card: Card) -> Self {
-        Self {cards: vec![card]}
+        Self { cards: vec![card] }
     }
 
     ///Add a card to the hand
@@ -84,7 +89,10 @@ impl PlayerHand {
     ///assert_eq!(player.sum(player.len()-1, 1), 1);
     ///```
     pub fn sum(&self, last_index: usize, ace_val: u32) -> u32 {
-        self.cards[..last_index+1].iter().map(|a| a.value().as_num(ace_val)).sum()
+        self.cards[..last_index + 1]
+            .iter()
+            .map(|a| a.value().as_num(ace_val))
+            .sum()
     }
 }
 

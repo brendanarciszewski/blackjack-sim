@@ -1,26 +1,27 @@
-use std::error::Error;
+use blackjack_sim::deck::{Deck, PlayerHand, ShuffledDeck};
 use csv::Writer;
-use blackjack_sim::deck::{Deck, ShuffledDeck, PlayerHand};
+use std::error::Error;
 
 fn main() -> Result<(), Box<dyn Error>> {
     static TRIALS: u32 = 10_000;
     static ACE_VAL: u32 = 11;
     static ACE_VAL_3RD_CARD: u32 = 1;
-    
+
     let mut wtr = Writer::from_path("./target/output.csv")?;
-    wtr.write_record(&["Player's 1st Card",
-                       "Player's 1st Card Value",
-                       "Dealer's 1st Card",
-                       "Dealer's 1st Card Value",
-                       "Player's 2nd Card",
-                       "Player's 2nd Card Value",
-                       "Dealer's 2nd Card",
-                       "Dealer's 2nd Card Value",
-                       "Player's 3rd Card",
-                       "Player's 3rd Card Value",
-                       "Dealer's 3rd Card",
-                       "Dealer's 3rd Card Value"])?;
-    
+    wtr.write_record(&[
+        "Player's 1st Card",
+        "Player's 1st Card Value",
+        "Dealer's 1st Card",
+        "Dealer's 1st Card Value",
+        "Player's 2nd Card",
+        "Player's 2nd Card Value",
+        "Dealer's 2nd Card",
+        "Dealer's 2nd Card Value",
+        "Player's 3rd Card",
+        "Player's 3rd Card Value",
+        "Dealer's 3rd Card",
+        "Dealer's 3rd Card Value",
+    ])?;
 
     let data = ShuffledDeck::simulate(TRIALS, |mut deck| {
         let mut player = PlayerHand::new();
