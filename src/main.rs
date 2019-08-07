@@ -7,9 +7,9 @@ use std::{
 };
 
 fn main() -> Result<(), Box<dyn Error>> {
-    static TRIALS: u32 = 10_000;
-    static ACE_VAL: u8 = 11;
-    static ACE_VAL_3RD_CARD: u8 = 1;
+    const TRIALS: u32 = 10_000;
+    const ACE_VAL: u8 = 11;
+    const ACE_VAL_3RD_CARD: u8 = 1;
 
     let mut wtr = Writer::from_path("./target/output.csv")?;
     wtr.write_record(&[
