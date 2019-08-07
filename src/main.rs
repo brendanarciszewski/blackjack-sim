@@ -1,11 +1,15 @@
-use blackjack_sim::deck::{Deck, PlayerHand, ShuffledDeck};
+use blackjack_sim::deck::{Deck, ShuffledDeck};
 use csv::Writer;
-use std::error::Error;
+use std::{
+    error::Error,
+    mem::{self, MaybeUninit},
+    ptr,
+};
 
 fn main() -> Result<(), Box<dyn Error>> {
     static TRIALS: u32 = 10_000;
-    static ACE_VAL: u32 = 11;
-    static ACE_VAL_3RD_CARD: u32 = 1;
+    static ACE_VAL: u8 = 11;
+    static ACE_VAL_3RD_CARD: u8 = 1;
 
     let mut wtr = Writer::from_path("./target/output.csv")?;
     wtr.write_record(&[
@@ -23,31 +27,40 @@ fn main() -> Result<(), Box<dyn Error>> {
         "Dealer's 3rd Card Value",
     ])?;
 
+    const HANDS: usize = 2;
+    const CELLS_PER_HAND_PER_DEAL: usize = 2;
+    const DEALS: usize = 3;
+    const TOTAL: usize = HANDS * DEALS * CELLS_PER_HAND_PER_DEAL;
     let data = ShuffledDeck::simulate(TRIALS, |mut deck| {
-        let mut player = PlayerHand::new();
-        let mut dealer = PlayerHand::new();
-        for _ in 0..3 {
-            player.push(deck.pick().unwrap());
-            dealer.push(deck.pick().unwrap());
-        }
-        [
-            format!("{:?}", player[0]),
-            format!("{}", player[0].value().as_num(ACE_VAL)),
-            format!("{:?}", dealer[0]),
-            format!("{}", dealer[0].value().as_num(ACE_VAL)),
-            format!("{:?}", player[1]),
-            format!("{}", player[1].value().as_num(ACE_VAL)),
-            format!("{:?}", dealer[1]),
-            format!("{}", dealer[1].value().as_num(ACE_VAL)),
-            format!("{:?}", player[2]),
-            format!("{}", player[2].value().as_num(ACE_VAL_3RD_CARD)),
-            format!("{:?}", dealer[2]),
-            format!("{}", dealer[2].value().as_num(ACE_VAL_3RD_CARD)),
-        ]
+        let mut row: [MaybeUninit<String>; TOTAL] = unsafe { MaybeUninit::uninit().assume_init() };
+        let row: [String; TOTAL] = {
+            let mut i = 0;
+            while i < TOTAL {
+                let ace = if i < HANDS * 2 /* Deals */ * CELLS_PER_HAND_PER_DEAL {
+                    ACE_VAL
+                } else {
+                    ACE_VAL_3RD_CARD
+                };
+                for _ in 0..HANDS {
+                    let card = deck.pick().unwrap();
+                    unsafe {
+                        ptr::write(row[i].as_mut_ptr(), format!("{}", card));
+                        ptr::write(
+                            row[i + 1].as_mut_ptr(),
+                            format!("{}", card.value().as_num(ace)),
+                        )
+                    }
+                    i += 2;
+                }
+            }
+            unsafe { mem::transmute(row) }
+        };
+        row
     });
 
     for row in data {
         wtr.write_record(&row)?;
     }
+    println!("Finished");
     Ok(())
 }

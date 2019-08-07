@@ -1,8 +1,9 @@
 //! Contains useful groups of Cards
 use super::sim::Simulation;
-use crate::card::{attr::IntegerToEnum, *};
+use crate::card::*;
 use rand::{self, seq::SliceRandom};
 use std::{
+    convert::TryFrom,
     default::Default,
     iter::{Iterator, Map},
     ops::{Deref, FnMut},
@@ -25,8 +26,8 @@ impl ShuffledDeck {
         let mut cards = vec![];
         for num_s in 0..4 {
             for num_v in 1..14 {
-                let value = attr::Value::get_item(num_v).unwrap();
-                let suit = attr::Suit::get_item(num_s).unwrap();
+                let value = attr::Value::try_from(num_v).unwrap();
+                let suit = attr::Suit::try_from(num_s).unwrap();
                 cards.push(Card::new(value, suit));
             }
         }
@@ -88,10 +89,10 @@ impl PlayerHand {
     ///player.push(Card::new(attr::Value::Ace, attr::Suit::Heart));
     ///assert_eq!(player.sum(player.len()-1, 1), 1);
     ///```
-    pub fn sum(&self, last_index: usize, ace_val: u32) -> u32 {
-        self.cards[..last_index + 1]
+    pub fn sum(&self, last_index: usize, ace_val: u8) -> u16 {
+        self.cards[..=last_index]
             .iter()
-            .map(|a| a.value().as_num(ace_val))
+            .map(|a| a.value().as_num(ace_val) as u16)
             .sum()
     }
 }

@@ -1,23 +1,27 @@
 //! Useful model of a Card
 pub mod attr;
 use attr::*;
+use std::fmt;
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Constructor)]
 pub struct Card {
     value: Value,
-    suit: Suit
+    suit: Suit,
 }
 
 impl Card {
-    pub fn new(value: Value, suit: Suit) -> Self {
-        Self {value, suit}
-    }
-
     pub fn value(&self) -> &Value {
         &self.value
     }
 
     pub fn suit(&self) -> &Suit {
         &self.suit
+    }
+}
+
+impl fmt::Display for Card {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        //TODO: format specifier currently not working
+        write!(f, "{:_>2}{}", self.value, self.suit)
     }
 }
